@@ -1,4 +1,4 @@
-# quantself
+# Aryalytics
 
 Personal sleeping-heart-rate dashboard. Local-first. Reads JSON exports from the
 [Health Auto Export](https://www.healthexportapp.com/) iOS app, stores them in

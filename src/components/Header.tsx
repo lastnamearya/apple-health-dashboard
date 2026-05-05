@@ -1,10 +1,16 @@
-export function Header({ totalNights, totalSamples }: { totalNights: number; totalSamples: number }) {
+export function Header({
+  totalNights,
+  totalSamples,
+}: {
+  totalNights: number;
+  totalSamples: number;
+}) {
   return (
     <header className="hairline-b">
       <div className="px-8 py-6 flex items-baseline justify-between">
         <div className="flex items-baseline gap-6">
           <div className="flex items-baseline gap-2">
-            <span className="label-eyebrow">Quantself</span>
+            <span className="label-eyebrow">Aryalytics</span>
             <span className="text-ink-500">/</span>
             <span className="label-eyebrow text-pulse">Sleeping HR</span>
           </div>

@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "QUANTSELF / SLEEPING HR",
+  title: "Aryalytics / SLEEPING HR",
   description: "Personal heart rate analytics from Apple Watch sleep data",
 };
 
