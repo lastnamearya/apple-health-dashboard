@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Distinctive font choices: Fraunces (display serif, characterful),
+       IBM Plex Sans (body, condensed feel), JetBrains Mono (data) */
+    --font-display: "Fraunces", ui-serif, Georgia, serif;
+    --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+
+  html, body {
+    background: #0a0a0b;
+    color: #e4e4ec;
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Subtle film-grain texture for warmth */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: #ff3b3b;
+    color: #0a0a0b;
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0a0b; }
+  ::-webkit-scrollbar-thumb { background: #2a2a32; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3d3d48; }
+}
+
+@layer utilities {
+  .hairline-b {
+    border-bottom: 1px solid #1d1d22;
+  }
+  .hairline-t {
+    border-top: 1px solid #1d1d22;
+  }
+  .hairline-r {
+    border-right: 1px solid #1d1d22;
+  }
+
+  /* Tabular numbers everywhere by default for stats */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tracking-ultra label style used for axis/section labels */
+  .label-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #5a5a68;
+  }
+}

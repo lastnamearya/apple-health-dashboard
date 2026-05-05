@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+*.db
+*.db-journal
+data/inbox/*
+data/archive/*
+!data/inbox/.gitkeep
+!data/archive/.gitkeep
+.env
+.env.local
+.DS_Store
+next-env.d.ts
