@@ -49,6 +49,41 @@ sqlite.exec(`
     sample_count INTEGER NOT NULL,
     computed_at INTEGER NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS daily_steps (
+    date TEXT PRIMARY KEY,
+    steps REAL NOT NULL,
+    source TEXT,
+    ingested_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS resting_hr (
+    date TEXT PRIMARY KEY,
+    value REAL NOT NULL,
+    source TEXT,
+    ingested_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS hrv_samples (
+    date TEXT PRIMARY KEY,
+    value REAL NOT NULL,
+    source TEXT,
+    ingested_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS vo2_max_samples (
+    date TEXT PRIMARY KEY,
+    value REAL NOT NULL,
+    source TEXT,
+    ingested_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS weight_samples (
+    date TEXT PRIMARY KEY,
+    value REAL NOT NULL,
+    source TEXT,
+    ingested_at INTEGER NOT NULL
+  );
 `);
 
 export const db = drizzle(sqlite, { schema });

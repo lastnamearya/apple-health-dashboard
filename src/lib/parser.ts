@@ -138,6 +138,113 @@ export function parseHrSamples(
 }
 
 // =============================================================================
+// DAILY METRICS (steps, resting HR, HRV, VO2 max, weight)
+// =============================================================================
+
+export type DailyStepsRow = {
+  date: string; // YYYY-MM-DD
+  steps: number;
+  source: string | null;
+  ingestedAt: number;
+};
+
+export type DailyValueRow = {
+  date: string; // YYYY-MM-DD
+  value: number;
+  source: string | null;
+  ingestedAt: number;
+};
+
+function extractDate(s: Record<string, any>): string | null {
+  const dateStr = s?.date ?? s?.start;
+  if (!dateStr || typeof dateStr !== "string") return null;
+  try {
+    const ts = parseAutoExportDate(dateStr);
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  } catch {
+    return null;
+  }
+}
+
+/** Steps are summed per day to handle multiple time-bucket entries. */
+export function parseSteps(
+  file: AutoExportFile,
+  now = Date.now()
+): DailyStepsRow[] {
+  const m = file.data.metrics.find((m) => m.name === "step_count");
+  if (!m?.data) return [];
+
+  const byDay = new Map<string, number>();
+  const sourceByDay = new Map<string, string | null>();
+  for (const s of m.data) {
+    if (s.qty == null) continue;
+    const date = extractDate(s);
+    if (!date) continue;
+    byDay.set(date, (byDay.get(date) ?? 0) + Number(s.qty));
+    if (!sourceByDay.has(date)) sourceByDay.set(date, s.source ?? null);
+  }
+
+  return Array.from(byDay.entries()).map(([date, steps]) => ({
+    date,
+    steps,
+    source: sourceByDay.get(date) ?? null,
+    ingestedAt: now,
+  }));
+}
+
+function parseDailyQty(
+  file: AutoExportFile,
+  metricName: string,
+  now: number
+): DailyValueRow[] {
+  const m = file.data.metrics.find((m) => m.name === metricName);
+  if (!m?.data) return [];
+
+  const out: DailyValueRow[] = [];
+  for (const s of m.data) {
+    if (s.qty == null) continue;
+    const date = extractDate(s);
+    if (!date) continue;
+    out.push({
+      date,
+      value: Number(s.qty),
+      source: s.source ?? null,
+      ingestedAt: now,
+    });
+  }
+  return out;
+}
+
+export function parseRestingHr(
+  file: AutoExportFile,
+  now = Date.now()
+): DailyValueRow[] {
+  return parseDailyQty(file, "resting_heart_rate", now);
+}
+
+export function parseHrv(
+  file: AutoExportFile,
+  now = Date.now()
+): DailyValueRow[] {
+  return parseDailyQty(file, "heart_rate_variability", now);
+}
+
+export function parseVo2Max(
+  file: AutoExportFile,
+  now = Date.now()
+): DailyValueRow[] {
+  return parseDailyQty(file, "vo2_max", now);
+}
+
+export function parseWeight(
+  file: AutoExportFile,
+  now = Date.now()
+): DailyValueRow[] {
+  return parseDailyQty(file, "weight_body_mass", now);
+}
+
+// =============================================================================
 // SLEEP — supports both pre-aggregated session format AND per-segment format
 // =============================================================================
 

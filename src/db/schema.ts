@@ -64,3 +64,43 @@ export const nightlyHrStats = sqliteTable("nightly_hr_stats", {
   sampleCount: integer("sample_count").notNull(),
   computedAt: integer("computed_at").notNull(),
 });
+
+/** Aggregated daily step count (summed across all sources). */
+export const dailySteps = sqliteTable("daily_steps", {
+  date: text("date").primaryKey(), // YYYY-MM-DD
+  steps: real("steps").notNull(),
+  source: text("source"),
+  ingestedAt: integer("ingested_at").notNull(),
+});
+
+/** Apple Watch resting heart rate — one measurement per day. */
+export const restingHr = sqliteTable("resting_hr", {
+  date: text("date").primaryKey(), // YYYY-MM-DD
+  value: real("value").notNull(), // bpm
+  source: text("source"),
+  ingestedAt: integer("ingested_at").notNull(),
+});
+
+/** Heart rate variability (SDNN, ms) — typically one Apple Watch measurement per day. */
+export const hrvSamples = sqliteTable("hrv_samples", {
+  date: text("date").primaryKey(), // YYYY-MM-DD
+  value: real("value").notNull(), // ms
+  source: text("source"),
+  ingestedAt: integer("ingested_at").notNull(),
+});
+
+/** VO₂ max (mL/kg/min) — updated after cardio workouts. */
+export const vo2MaxSamples = sqliteTable("vo2_max_samples", {
+  date: text("date").primaryKey(), // YYYY-MM-DD
+  value: real("value").notNull(),
+  source: text("source"),
+  ingestedAt: integer("ingested_at").notNull(),
+});
+
+/** Body weight (kg) — one value per day (last measurement wins). */
+export const weightSamples = sqliteTable("weight_samples", {
+  date: text("date").primaryKey(), // YYYY-MM-DD
+  value: real("value").notNull(), // kg
+  source: text("source"),
+  ingestedAt: integer("ingested_at").notNull(),
+});

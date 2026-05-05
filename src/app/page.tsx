@@ -2,6 +2,7 @@ import { sqlite } from "@/db/client";
 import { Header } from "@/components/Header";
 import { StatsPanel } from "@/components/StatsPanel";
 import { TrendChart } from "@/components/TrendChart";
+import { MetricsGrid, type MetricsData } from "@/components/MetricsGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -75,11 +76,53 @@ async function getTrend() {
   return withRolling;
 }
 
+function computeSleepScore(latest: any): MetricsData["sleepScore"] {
+  if (!latest?.total_minutes) return null;
+  const total = latest.total_minutes;
+  const duration = Math.min(total / 480, 1) * 40;
+  const deep = Math.min(latest.deep_minutes / Math.max(total * 0.2, 1), 1) * 25;
+  const rem = Math.min(latest.rem_minutes / Math.max(total * 0.25, 1), 1) * 25;
+  const efficiency = Math.max(0, 1 - (latest.awake_minutes ?? 0) / Math.max(total, 1)) * 10;
+  return {
+    score: Math.round(duration + deep + rem + efficiency),
+    duration: Math.round(duration),
+    deep: Math.round(deep),
+    rem: Math.round(rem),
+    efficiency: Math.round(efficiency),
+  };
+}
+
+async function getMetrics(): Promise<MetricsData> {
+  const steps7d = sqlite
+    .prepare(`SELECT date, steps FROM daily_steps ORDER BY date DESC LIMIT 7`)
+    .all() as any[];
+  const rhr7d = sqlite
+    .prepare(`SELECT date, value FROM resting_hr ORDER BY date DESC LIMIT 7`)
+    .all() as any[];
+  const hrv7d = sqlite
+    .prepare(`SELECT date, value FROM hrv_samples ORDER BY date DESC LIMIT 7`)
+    .all() as any[];
+  const vo2Latest = sqlite
+    .prepare(`SELECT date, value FROM vo2_max_samples ORDER BY date DESC LIMIT 1`)
+    .get() as any ?? null;
+  const weight7d = sqlite
+    .prepare(`SELECT date, value FROM weight_samples ORDER BY date DESC LIMIT 7`)
+    .all() as any[];
+
+  return { steps7d, rhr7d, hrv7d, vo2Latest, weight7d, sleepScore: null };
+}
+
 export default async function HomePage() {
   const stats = await getStats();
   const rows = await getTrend();
+  const metrics = await getMetrics();
   const hasData = stats.totals.nights > 0;
   const hasHrInSleep = rows.some((r: any) => r.minHr != null);
+
+  const metricsWithScore: MetricsData = {
+    ...metrics,
+    sleepScore: computeSleepScore(stats.latest),
+  };
 
   return (
     <main className="min-h-screen bg-ink-950 text-ink-100">
@@ -95,6 +138,7 @@ export default async function HomePage() {
       ) : (
         <>
           <StatsPanel data={stats} />
+          <MetricsGrid metrics={metricsWithScore} />
           <TrendChart rows={rows} />
         </>
       )}

@@ -19,24 +19,29 @@ function fmtDuration(min: number | null | undefined) {
 export function StatsPanel({ data }: { data: any }) {
   const latest = data?.latest;
   const b = data?.baselines ?? {};
-  const minDelta =
-    latest?.min_hr != null && b.min7 != null
-      ? latest.min_hr - b.min7
+  const avgDelta =
+    latest?.avg_hr != null && b.avg7 != null
+      ? latest.avg_hr - b.avg7
       : null;
 
   return (
     <section className="hairline-b">
       <div className="grid grid-cols-12 gap-px bg-ink-700">
-        {/* HEADLINE: latest sleeping low */}
+        {/* HEADLINE: last night avg sleep HR */}
         <div className="col-span-12 lg:col-span-5 bg-ink-950 px-8 py-10">
-          <div className="label-eyebrow mb-3">Last Night · Sleeping Low</div>
+          <div className="label-eyebrow mb-3">Last Night · Sleep Avg HR</div>
           <div className="flex items-baseline gap-3">
             <span className="font-display tnum text-pulse text-[7rem] leading-none font-light">
-              {fmtNumber(latest?.min_hr, 0)}
+              {fmtNumber(latest?.avg_hr, 0)}
             </span>
             <span className="font-mono text-sm text-ink-400">bpm</span>
           </div>
-          <div className="mt-4 flex items-center gap-4 text-xs text-ink-300 tnum">
+          <div className="mt-2 flex items-center gap-2 text-xs text-ink-400 tnum">
+            <span className="font-mono">low {fmtNumber(latest?.min_hr, 0)}</span>
+            <span className="text-ink-600">·</span>
+            <span className="font-mono">high {fmtNumber(latest?.max_hr, 0)}</span>
+          </div>
+          <div className="mt-3 flex items-center gap-4 text-xs text-ink-300 tnum">
             <span>{latest?.night_date ?? "—"}</span>
             <span className="text-ink-500">·</span>
             <span>
@@ -45,20 +50,20 @@ export function StatsPanel({ data }: { data: any }) {
             <span className="text-ink-500">·</span>
             <span>{fmtDuration(latest?.total_minutes)}</span>
           </div>
-          {minDelta != null && (
+          {avgDelta != null && (
             <div className="mt-6 flex items-baseline gap-2">
-              <span className="label-eyebrow">vs. 7-day baseline</span>
+              <span className="label-eyebrow">vs. 7-day avg baseline</span>
               <span
                 className={`font-mono text-sm tnum ${
-                  minDelta < -0.5
+                  avgDelta < -0.5
                     ? "text-signal-green"
-                    : minDelta > 0.5
+                    : avgDelta > 0.5
                       ? "text-signal-amber"
                       : "text-ink-200"
                 }`}
               >
-                {minDelta > 0 ? "+" : ""}
-                {minDelta.toFixed(1)}
+                {avgDelta > 0 ? "+" : ""}
+                {avgDelta.toFixed(1)}
               </span>
             </div>
           )}
@@ -93,17 +98,16 @@ export function StatsPanel({ data }: { data: any }) {
         {/* BASELINES */}
         <div className="col-span-6 lg:col-span-2 bg-ink-950 px-8 py-10">
           <div className="label-eyebrow mb-4">Baselines</div>
-          <Baseline label="Low · 7d" value={fmtNumber(b.min7, 1)} />
-          <Baseline label="Low · 30d" value={fmtNumber(b.min30, 1)} />
           <Baseline label="Avg · 7d" value={fmtNumber(b.avg7, 1)} />
           <Baseline label="Avg · 30d" value={fmtNumber(b.avg30, 1)} />
+          <Baseline label="Low · 7d" value={fmtNumber(b.min7, 1)} />
+          <Baseline label="Low · 30d" value={fmtNumber(b.min30, 1)} />
         </div>
 
-        {/* AVG / MAX / SAMPLES */}
+        {/* SAMPLES */}
         <div className="col-span-12 lg:col-span-2 bg-ink-950 px-8 py-10">
           <div className="label-eyebrow mb-4">Last Night</div>
-          <Baseline label="Mean" value={fmtNumber(latest?.avg_hr, 1)} />
-          <Baseline label="Max" value={fmtNumber(latest?.max_hr, 0)} />
+          <Baseline label="P5" value={fmtNumber(latest?.p5_hr, 1)} />
           <Baseline
             label="Samples"
             value={(latest?.sample_count ?? 0).toLocaleString()}
