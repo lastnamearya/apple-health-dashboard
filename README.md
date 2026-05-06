@@ -1,5 +1,9 @@
 # Aryalytics
 
+<img width="3840" height="2946" alt="screencapture-localhost-3000-2026-05-06-09_59_44" src="https://github.com/user-attachments/assets/88c01e20-f56e-4cc5-9bba-b23c1d8ecfb0" />
+
+#
+
 Personal sleeping-heart-rate dashboard. Local-first. Reads JSON exports from the
 [Health Auto Export](https://www.healthexportapp.com/) iOS app, stores them in
 SQLite, and serves a Next.js dashboard on `localhost:3000`.
